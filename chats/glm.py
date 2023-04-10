@@ -50,7 +50,7 @@ def chat_stream(
         print(f"bot_summarized_response: {bot_summarized_response}")
         yield (state_chatbot, state_chatbot, f"{context}. {bot_summarized_response}".strip())
         
-    instruction_prompt = gen_prompt(instruction, state_chatbot, f"{context} {bot_summarized_response}")[0]
+    instruction_prompt = generate_prompt(instruction, state_chatbot, f"{context} {bot_summarized_response}")[0]
     print(instruction_prompt)
     
     bot_response = global_vars.stream_model(
