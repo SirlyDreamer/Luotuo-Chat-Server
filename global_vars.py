@@ -1,6 +1,7 @@
 from models import alpaca_model
 from models import flan_alpaca
 from models import llama_rlhf
+from models import glm_model
 from gens.stream_gen import StreamModel
 
 from miscs.utils import get_generation_config, get_constraints_config
@@ -22,9 +23,8 @@ def initialize_globals(args):
         model_type = "baize"
     elif "llama" in args.ft_ckpt_url:
         model_type = "llama"
-    else:
-        print("unsupported model type. only llamastack, alpaca, flan, and baize are supported")
-        quit()
+    elif ".pt" in args.ft_ckpt_url:
+        model_type = "glm"
 
     load_model = get_load_model(model_type)
     model, tokenizer = load_model(
@@ -51,5 +51,7 @@ def get_load_model(model_type):
         return flan_alpaca.load_model
     elif model_type == "llama":
         return llama_rlhf.load_model
+    elif model_type == "glm":
+        return glm_model.load_model
     else:
         return None    
