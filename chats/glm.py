@@ -9,18 +9,20 @@ from miscs.constants import num_of_characters_to_keep
 from miscs.utils import common_post_process, post_processes_batch, post_process_stream
 
 def generate_prompt(instruct, histories, ctx):
-    convs = f"""Instruction: "请帮我总结以下内容:" \n Input: {instruct} \n Answer: """
+    convs = f"""Instruction: "请帮我总结以下内容:" \nInput: {instruct} \nAnswer: """
     return convs, len(convs)
+
 
 def chat_stream(
     context,
     instruction,
     state_chatbot,
 ):
+    import torch
+    torch.set_default_tensor_type(torch.cuda.FloatTensor)
     if global_vars.constraints_config.len_exceed(context, instruction):
         raise gr.Error("context or prompt is too long!")
     
-    # gen_prompt = partial(generate_prompt, ctx_indicator="### Input:", user_indicator="### Instruction:", ai_indicator="### Response:")
     bot_summarized_response = ''
     
     # user input should be appropriately formatted (don't be confused by the function name)
@@ -52,13 +54,14 @@ def chat_stream(
         
     instruction_prompt = generate_prompt(instruction, state_chatbot, f"{context} {bot_summarized_response}")[0]
     print(instruction_prompt)
-    
-    bot_response = global_vars.stream_model(
-        instruction_prompt,
-        max_tokens=2048,
-        temperature=0,
-        top_p=0.9
-    )
+    input_ids = global_vars.tokenizer.encode(instruction_prompt, return_tensors='pt')
+    bot_response = global_vars.model.generate(
+            input_ids=input_ids,
+            max_length=2048,
+            temperature=0,
+            top_p=0.9
+        )
+    bot_response = [global_vars.tokenizer.decode(r) for r in bot_response]
     
     instruction_display = None if instruction_display == SPECIAL_STRS["continue"] else instruction_display
     state_chatbot = state_chatbot + [(instruction_display, None)]
@@ -93,6 +96,7 @@ def chat_stream(
                     cutoff_idx = 0
 
         if agg_tokens == "":
+            tokens = tokens[tokens.find("Answer: ")+len("Answer: "):]
             processed_response, to_exit = post_process_stream(tokens)
             state_chatbot[-1] = (instruction_display, processed_response)
             yield (state_chatbot, state_chatbot, f"{context} {bot_summarized_response}".strip())

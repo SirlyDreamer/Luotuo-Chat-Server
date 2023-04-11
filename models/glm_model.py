@@ -32,6 +32,8 @@ def load_model(base, finetuned, multi_gpu, force_download_ckpt):
             torch.load(finetuned),
             strict=False
         )
+        model.half()
+
         return model, tokenizer
     else:
         model = AutoModel.from_pretrained(
