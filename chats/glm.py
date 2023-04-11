@@ -9,7 +9,7 @@ from miscs.constants import num_of_characters_to_keep
 from miscs.utils import common_post_process, post_processes_batch, post_process_stream
 
 def generate_prompt(instruct, histories, ctx):
-    convs = f"""Instruction: "请帮我总结以下内容:" \nInput: {instruct} \nAnswer: """
+    convs = f"""Instruction: 请帮我总结以下内容: \nInput: {instruct} \nAnswer: """
     return convs, len(convs)
 
 

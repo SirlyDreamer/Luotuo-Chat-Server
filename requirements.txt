@@ -6,3 +6,4 @@ git+https://github.com/huggingface/transformers.git
 git+https://github.com/huggingface/peft.git
 gradio
 tenacity
+protobuf>=4.22.1
