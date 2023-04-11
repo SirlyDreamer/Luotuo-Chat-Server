@@ -18,8 +18,6 @@ def chat_stream(
     instruction,
     state_chatbot,
 ):
-    import torch
-    torch.set_default_tensor_type(torch.cuda.FloatTensor)
     if global_vars.constraints_config.len_exceed(context, instruction):
         raise gr.Error("context or prompt is too long!")
     
@@ -72,6 +70,7 @@ def chat_stream(
     cutoff_idx = 0
     for tokens in bot_response:
         tokens = tokens.strip()
+        print(tokens)
         cur_token = tokens[prev_index:]
         
         if "#" in cur_token and agg_tokens == "":
