@@ -18,9 +18,7 @@ def chat_stream(
     instruction,
     state_chatbot,
 ):
-    if global_vars.constraints_config.len_exceed(context, instruction):
-        raise gr.Error("context or prompt is too long!")
-    
+      
     bot_summarized_response = ''
     
     # user input should be appropriately formatted (don't be confused by the function name)
